@@ -16,7 +16,7 @@ func handleCommands(args []string, tasks []task) ([]task, error) {
 	case "add":
 		tasks, err = add(args, tasks)
 	case "list":
-		// err = list(args, tasks)
+		err = list(args, tasks)
 	case "update":
 	case "delete":
 	case "mark-in-progress":
@@ -34,6 +34,7 @@ func add(args []string, tasks []task) ([]task, error) {
 	newTask := task{
 		Id: len(tasks) + 1,
 		Description: args[2],
+		TaskStatus: todo,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -45,7 +46,39 @@ func add(args []string, tasks []task) ([]task, error) {
 	return tasks, nil 
 }
 
-// func list(args []string, tasks []task) error {
-// 	return 
-// }
+func list(args []string, tasks []task) error {
+	if len(args) < 2 || len(args) > 3 {
+		return fmt.Errorf("error! usage: list [done|todo|in-progress]")
+	}
+	if len(tasks) < 1 {
+		return fmt.Errorf("error! empty list, try 'add'")
+	}
 
+	filter := none
+	if len(args) == 3 {
+		switch args[2] {
+		case "todo":
+			filter = todo
+		case "done":
+			filter = done 
+		case "in-progress":
+			filter = inProgress 
+		default:
+		return fmt.Errorf("error! usage: list [done|todo|in-progress]")
+		}
+	}
+
+	listHelper(filter, tasks)
+	return nil  
+}
+
+func listHelper(filter status, tasks []task) {
+	for _, v := range tasks {
+		if filter == none || filter == v.TaskStatus {
+			fmt.Printf("[%v] %q %v (created: %v updated: %v)\n",
+				v.Id, v.Description, v.TaskStatus,
+				v.CreatedAt.Format("2006-01-02 15:04"),
+				v.CreatedAt.Format("2006-01-02 15:04"))
+		}
+	} 
+}

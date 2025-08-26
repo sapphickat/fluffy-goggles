@@ -14,6 +14,7 @@ const (
 	todo status = iota
 	inProgress
 	done
+	none
 )
 
 var statusName = map[status]string{
