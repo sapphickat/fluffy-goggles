@@ -7,15 +7,15 @@ import (
 func main() {
 
 	// load file
-	tasks, err := getTasks()
+	dataF, err := getDataFile()
 	criticalErrorCheck(err , 1)	
 
 	// logic
-	tasks, err = handleCommands(os.Args, tasks)
+	dataF, err = handleCommands(os.Args, dataF)
 	criticalErrorCheck(err , 1)	
 
 	// save 
-	err = saveTasks(tasks)
+	err = saveTasks(dataF)
 	criticalErrorCheck(err , 1)	
 
 }

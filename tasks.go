@@ -35,39 +35,44 @@ type task struct {
 	UpdatedAt		time.Time `json:"updated_at"`
 }
 
-func getTasks() ([]task, error) {
+type dataFile struct {
+	LastId	int 		`json:"last_id"`	
+	Tasks		[]task	`json:"tasks"` 
+}
+
+func getDataFile() (dataFile, error) {
 	file, err := os.OpenFile("data.json", os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
-		return nil, fmt.Errorf("error opening the file: %w", err)
+		return dataFile{}, fmt.Errorf("error opening the file: %w", err)
 	}
 
 	defer file.Close()
 
 	byte_data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("error reading the file: %w", err)
+		return dataFile{}, fmt.Errorf("error reading the file: %w", err)
 	}
 
-	var tasks []task
+	var data dataFile
 	
 	if len(byte_data) != 0 { // maybe not the best solution, but works 
-		err = json.Unmarshal(byte_data, &tasks)
+		err = json.Unmarshal(byte_data, &data)
 		if err != nil {
-			return nil, fmt.Errorf("error unmarshaling the data: %w", err)
+			return dataFile{}, fmt.Errorf("error unmarshaling the data: %w", err)
 		}
 	}
 
-	return tasks, nil
+	return data, nil
 }
 
-func saveTasks(tasks []task) error {
+func saveTasks(dataF dataFile) error {
 	file, err := os.OpenFile("data.json", os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	if err != nil {
 		return fmt.Errorf("error opening the file: %w", err)
 	}
 	defer file.Close()
 
-	json_bytes, err := json.MarshalIndent(tasks, "", "  ") 
+	json_bytes, err := json.MarshalIndent(dataF, "", "  ") 
 	if err != nil {
 		return fmt.Errorf("error marshaling data: %w", err)
 	}
